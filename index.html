@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fourier de 0 a 100 — Guía Interactiva | Comunicaciones I (IS723)</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<button class="btn-menu" id="btn-menu" aria-label="Menú">☰</button>
+
+<!-- ======================= BARRA LATERAL ======================= -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>Fourier de 0 a 100</h1>
+    <p>Guía interactiva · Comunicaciones I (IS723) · UTP</p>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Tu progreso</span>
+        <span id="progress-num">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-nivel">0–20 <span>· Cimientos</span></div>
+    <a class="nav-link" href="#s-intro"><span class="check">✓</span> Cómo usar la guía</a>
+    <a class="nav-link" href="#s-senal"><span class="check">✓</span> ¿Qué es una señal?</a>
+    <a class="nav-link" href="#s-sinusoide"><span class="check">✓</span> La sinusoide átomo</a>
+    <a class="nav-link" href="#s-dominio"><span class="check">✓</span> El límite del tiempo</a>
+
+    <div class="nav-nivel">20–40 <span>· Serie de Fourier</span></div>
+    <a class="nav-link" href="#s-idea"><span class="check">✓</span> La idea de Fourier</a>
+    <a class="nav-link" href="#s-armonicos"><span class="check">✓</span> Demo: armónicos</a>
+    <a class="nav-link" href="#s-coeficientes"><span class="check">✓</span> Coeficientes a₀, aₙ, bₙ</a>
+    <a class="nav-link" href="#s-euler"><span class="check">✓</span> Euler y la forma exponencial</a>
+    <a class="nav-link" href="#s-espectro"><span class="check">✓</span> Espectro de líneas</a>
+
+    <div class="nav-nivel">40–60 <span>· Transformada</span></div>
+    <a class="nav-link" href="#s-limites"><span class="check">✓</span> Del serie a la integral</a>
+    <a class="nav-link" href="#s-formulas"><span class="check">✓</span> Las dos fórmulas</a>
+    <a class="nav-link" href="#s-pares"><span class="check">✓</span> Pares y propiedades</a>
+    <a class="nav-link" href="#s-banda"><span class="check">✓</span> Ancho de banda + demo</a>
+
+    <div class="nav-nivel">60–80 <span>· Muestreo</span></div>
+    <a class="nav-link" href="#s-muestreo"><span class="check">✓</span> De x(t) a x(n)</a>
+    <a class="nav-link" href="#s-nyquist"><span class="check">✓</span> Nyquist + demo aliasing</a>
+    <a class="nav-link" href="#s-reconstruir"><span class="check">✓</span> Reconstrucción</a>
+    <a class="nav-link" href="#s-ecg"><span class="check">✓</span> Caso real: ECG</a>
+
+    <div class="nav-nivel">80–100 <span>· DFT y comunicaciones</span></div>
+    <a class="nav-link" href="#s-dft"><span class="check">✓</span> DFT y FFT</a>
+    <a class="nav-link" href="#s-comms"><span class="check">✓</span> FDM, OFDM, aplicaciones</a>
+    <a class="nav-link" href="#s-checklist"><span class="check">✓</span> Checklist del 100</a>
+
+    <div style="padding: 1rem 0.7rem 0;">
+      <button class="btn" id="btn-reset" style="width:100%;">↺ Reiniciar progreso</button>
+    </div>
+  </nav>
+</aside>
+
+<!-- ======================= CONTENIDO ======================= -->
+<main class="main">
+
+  <!-- ============ NIVEL 0–20 · CIMIENTOS ============ -->
+
+  <section class="seccion" id="s-intro">
+    <div class="hero">
+      <span class="nivel-badge">Nivel 0–100 · Ruta completa</span>
+      <h2>Entiende la Transformada de Fourier de verdad</h2>
+      <p>Esta guía te lleva desde cero (¿qué es una señal?) hasta el nivel donde puedes leer un paper de OFDM o programar una FFT en un ESP32. Intuición con demos interactivas primero, rigor matemático después, y todo conectado con <strong>Comunicaciones I</strong> y tu proyecto de <strong>ECG</strong>.</p>
+      <div class="roadmap">
+        <div class="roadmap-item"><span class="r-nivel">0–20</span><span class="r-desc">Señales, sinusoides, por qué el tiempo no basta</span></div>
+        <div class="roadmap-item"><span class="r-nivel">20–40</span><span class="r-desc">Serie de Fourier, a₀/aₙ/bₙ, Euler, espectro</span></div>
+        <div class="roadmap-item"><span class="r-nivel">40–60</span><span class="r-desc">Transformada integral, pares, ancho de banda</span></div>
+        <div class="roadmap-item"><span class="r-nivel">60–80</span><span class="r-desc">Muestreo, Nyquist, aliasing, tu ECG</span></div>
+        <div class="roadmap-item"><span class="r-nivel">80–100</span><span class="r-desc">DFT/FFT, FDM/OFDM, aplicaciones reales</span></div>
+      </div>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🗺️ Cómo estudiar esta guía</h4>
+      <ul>
+        <li><strong>Lee la teoría</strong> de cada sección — los bloques <em>verde</em> son intuición, los <em>morados</em> son rigor matemático.</li>
+        <li><strong>Juega con los demos</strong> — no los mires, manipula los deslizadores hasta que la respuesta te sorprenda. Eso es aprender Fourier.</li>
+        <li><strong>Responde el quiz</strong> al final de cada nivel — se guarda tu progreso en el navegador.</li>
+        <li><strong>Resuelve los ejercicios</strong> en papel primero; la solución está oculta debajo.</li>
+        <li>Tu progreso en la barra izquierda marca las secciones que ya visitaste.</li>
+      </ul>
+    </div>
+
+    <div class="tarjeta conexion">
+      <h4>🎯 ¿Por qué te importa esto en tu carrera?</h4>
+      <p>Todo lo que viaja por el aire o por un cable — WiFi, 4G/5G, radio, tu propio ECG digitalizado — se diseña, analiza y filtra en el <strong>dominio de la frecuencia</strong>. Fourier es el idioma. En <strong>Comunicaciones I</strong> construyes los cimientos; en <strong>Comunicaciones II</strong> los usarás para modulación, multiplexación y detección. El que domina Fourier adelanta medio semestre.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-senal">
+    <span class="nivel-badge">Nivel 0–20 · Cimientos</span>
+    <h2>1. ¿Qué es una señal?</h2>
+
+    <p>Una <strong>señal</strong> es una función que transporta información. El voltaje que mide tu sensor, el sonido que capta un micrófono, la presión de tu corazón convertida en voltio por el AD8232… todo son señales.</p>
+
+    <p>Escribimos las señales en el tiempo como <span class="inline-f">x(t)</span>: un valor para cada instante <span class="inline-f">t</span>.</p>
+
+    <div class="tarjeta intuicion">
+      <h4>💡 Anatomía de una sinusoide</h4>
+      <p>Toda señal periódica simple se describe con tres números:</p>
+      <ul>
+        <li><strong>Amplitud A</strong> — ¿qué tan fuerte? (la altura máxima desde el centro)</li>
+        <li><strong>Frecuencia f</strong> — ¿qué tan seguida? (ciclos por segundo, hertz)</li>
+        <li><strong>Fase φ</strong> — ¿dónde empieza? (desplazamiento angular)</li>
+      </ul>
+      <p>Todo lo demás es combinación de varias de estas. ¡Es el punto de partida de Fourier!</p>
+    </div>
+
+    <p>Las señales se clasifican según dos ejes:</p>
+    <div class="tabla-wrap">
+      <table>
+        <tr><th></th><th>Analógica (continua)</th><th>Digital (discreta)</th></tr>
+        <tr><td><strong>Dominio</strong></td><td>x(t): tiempo continuo</td><td>x[n]: solo instantes n/fs (muestras)</td></tr>
+        <tr><td><strong>Valor</strong></td><td>Cualquier voltio</td><td>Niveles cuantizados (p. ej. 0–4095 en el ADC del ESP32)</td></tr>
+        <tr><td><strong>Ejemplo</strong></td><td>Tensión del AD8232 salida</td><td>Lo que guardas en memoria tras muestrear</td></tr>
+      </table>
+    </div>
+
+    <!-- DEMO 1 -->
+    <div class="demo">
+      <div class="demo-cab"><span class="icono">▶</span> Demo 1 — Sintetizador: arma tu señal y mira su espectro</div>
+      <div class="demo-cuerpo">
+        <p class="demo-desc">Combina 3 senoides. A la izquierda ves la señal resultante en el <strong>dominio del tiempo</strong>; a la derecha, su <strong>espectro de frecuencias</strong> (las líneas que la componen). Este es el corazón de Fourier: una señal ↔ una lista de frecuencias. Juega con los presets.</p>
+        <div class="botones" id="syn-presets">
+          <button class="btn" data-preset="grave">Registro grave (50–150 Hz)</button>
+          <button class="btn" data-preset="agudo">Registro agudo (0.8–2.4 kHz)</button>
+          <button class="btn" data-preset="forma">Mezcla "forma de onda"</button>
+        </div>
+        <div class="controles">
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Amplitud C1</span><span class="valor" id="syn_a1_val"></span></div><input type="range" id="syn_a1" min="0" max="3" step="0.1" value="2"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Frecuencia C1</span><span class="valor" id="syn_f1_val"></span></div><input type="range" id="syn_f1" min="10" max="800" step="1" value="100"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Fase C1</span><span class="valor" id="syn_p1_val"></span></div><input type="range" id="syn_p1" min="0" max="360" step="1" value="0"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Amplitud C2</span><span class="valor" id="syn_a2_val"></span></div><input type="range" id="syn_a2" min="0" max="3" step="0.1" value="1"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Frecuencia C2</span><span class="valor" id="syn_f2_val"></span></div><input type="range" id="syn_f2" min="10" max="800" step="1" value="250"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Fase C2</span><span class="valor" id="syn_p2_val"></span></div><input type="range" id="syn_p2" min="0" max="360" step="1" value="90"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Amplitud C3</span><span class="valor" id="syn_a3_val"></span></div><input type="range" id="syn_a3" min="0" max="3" step="0.1" value="0.5"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Frecuencia C3</span><span class="valor" id="syn_f3_val"></span></div><input type="range" id="syn_f3" min="10" max="800" step="1" value="500"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Fase C3</span><span class="valor" id="syn_p3_val"></span></div><input type="range" id="syn_p3" min="0" max="360" step="1" value="180"></div>
+        </div>
+        <div class="graficos">
+          <div class="grafico-box">
+            <div class="grafico-titulo">Dominio del tiempo — x(t)</div>
+            <canvas id="syn-canvas-t"></canvas>
+          </div>
+          <div class="grafico-box">
+            <div class="grafico-titulo">Dominio de la frecuencia — |X(f)|</div>
+            <canvas id="syn-canvas-f"></canvas>
+          </div>
+        </div>
+        <div class="demo-leyenda">
+          <span class="ley-tiempo">Señal resultante</span>
+          <span class="ley-armónico">Componentes espectrales</span>
+        </div>
+        <div class="demo-salida" id="syn-salida"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ Observación clave del demo</h4>
+      <p>Cambia la frecuencia de C1: la línea en el espectro se mueve a izquierda/derecha. Cambia la amplitud: la línea sube/baja. Cambia la fase: ¡el espectro de amplitud NO cambia (solo cambian las posiciones relativas en el tiempo)! La fase afecta a la forma de onda, pero la "receta de frecuencias" es la misma. Este es el primer gran insight de Fourier.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-sinusoide">
+    <span class="nivel-badge">Nivel 0–20 · Cimientos</span>
+    <h2>2. La sinusoide: el átomo de todo</h2>
+
+    <div class="formula">
+      <span class="destacada">x(t) = A · sen(2π · f · t + φ)</span>
+      <small>A en volts, f en Hz, t en segundos, φ en radianes (o grados)</small>
+    </div>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Símbolo</th><th>Nombre</th><th>Unidad</th><th>Pregunta que responde</th></tr>
+        <tr><td>A</td><td>Amplitud</td><td>V (u otra)</td><td>¿Qué tan fuerte?</td></tr>
+        <tr><td>f = 1/T</td><td>Frecuencia</td><td>Hz = ciclos/s</td><td>¿Qué tan seguida?</td></tr>
+        <tr><td>T = 1/f</td><td>Periodo</td><td>s</td><td>¿Cuánto dura un ciclo?</td></tr>
+        <tr><td>ω = 2πf</td><td>Frecuencia angular</td><td>rad/s</td><td>¿Qué tan rápido gira el ángulo?</td></tr>
+        <tr><td>φ</td><td>Fase</td><td>rad (o °)</td><td>¿Dónde empieza el ciclo?</td></tr>
+      </table>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Rigor mínimo: por qué 2π?</h4>
+      <p>El argumento del seno es un <strong>ángulo</strong>. Si f Hz, entonces en 1 segundo hay f ciclos, y cada ciclo son 2π radianes → el ángulo recorre 2πf radianes por segundo: eso es ω. Por eso dentro del seno escribimos 2πf·t: convierte segundos en radianes totales recorridos.</p>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🎵 Analogía musical</h4>
+      <p>Un piano puede tocar cualquier melodía golpeando teclas (notas puras ≈ senoides). La <strong>serie de Fourier dice que matemáticamente esto también vale para electricidad</strong>: cualquier señal periódica "suena" como el acorde de sus armónicos. Un violín y un piano tocando la misma nota suenan distinto porque tienen distinto "cóctel de armónicos" — ¡mismo pitch (f), diferente receta espectral!</p>
+    </div>
+
+    <div class="tarjeta conexion">
+      <h4>🔌 Conexión IS723</h4>
+      <p>En tu script <span class="inline-f">Señal_analogica.py</span> generabas <span class="inline-f">A·sin(2πft)</span>. Tu script <span class="inline-f">Señales_3D.py</span> mezclaba varias con amplitud/frecuencia/fase — eso era <strong>síntesis aditiva</strong>, exactamente lo que hiciste en Demo 1. Ya sabes crear señales; ahora aprenderás a <em>descomponerlas</em>.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-dominio">
+    <span class="nivel-badge">Nivel 0–20 · Cimientos</span>
+    <h2>3. El límite del dominio del tiempo</h2>
+
+    <p>La gráfica x(t) vs t es intuitiva… y engañosa. Mira tu ECG: ¿ves la frecuencia dominante? ¿Hay interferencia de 60 Hz metida encima? A simple vista, <strong>imposible</strong>.</p>
+
+    <div class="tarjeta intuicion">
+      <h4>📖 Analogía: la receta vs el pastel</h4>
+      <p>El dominio del tiempo es el <strong>pastel horneado</strong>: ves el resultado final, bonito, pero no sabes cuántos huevos, harina o azúcar lleva. El dominio de la frecuencia es la <strong>receta</strong>: la lista de ingredientes con sus cantidades. Fourier es el proceso que va del pastel a la receta (y de vuelta).</p>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>⚖️ La dualidad tiempo–frecuencia</h4>
+      <p>Cada señal tiene <strong>dos direcciones</strong> igual de válidas:</p>
+      <ul>
+        <li><strong>Dominio del tiempo</strong>: ¿cuándo pasó? — bueno para ver eventos, picos, transitorios.</li>
+        <li><strong>Dominio de la frecuencia</strong>: ¿de qué está hecha? — bueno para filtrar, comprimir, multiplexar, medir ancho de banda.</li>
+      </ul>
+      <p>La Transformada de Fourier es el <strong>puente</strong> entre ambos. No es "otra señal": es la <em>misma</em> información contada de otra forma.</p>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ Regla de oro a memorizar</h4>
+      <p><strong>Alta frecuencia = cambios rápidos.</strong> Bajo frecuencia = tendencias lentas. El ruido de alta frecuencia, el susurro, el detalle fino — todo eso vive a la derecha del espectro. El tono grave, la línea de 60 Hz, el nivel DC — viven a la izquierda.</p>
+    </div>
+
+    <div class="quiz" data-quiz="q0" data-titulo="Nivel 0–20 · Cimientos"></div>
+    <div data-ejercicios="n0"></div>
+  </section>
+
+  <!-- ============ NIVEL 20–40 · SERIE DE FOURIER ============ -->
+
+  <section class="seccion" id="s-idea">
+    <span class="nivel-badge">Nivel 20–40 · Serie de Fourier</span>
+    <h2>4. La idea que cambió las matemáticas</h2>
+
+    <p>En 1807, Joseph Fourier le presentó a Napoleón una idea escandalosa: <strong>cualquier señal periódica, por irregular que sea, puede construirse sumando sinusoides</strong>. El matemático Lagrange protestó: "¡imposible representar una función con un salto usando solo funciones suaves!". Fourier tenía razón.</p>
+
+    <div class="tarjeta intuicion">
+      <h4>💡 La idea central en una frase</h4>
+      <p><strong>x(t) = suma de senos y cosenos a frecuencias múltiplos enteros de f₀</strong></p>
+      <p>Una onda cuadrada "tosca" resulta de sumar senos suaves — ¡cada vez más senos afinados a 3f₀, 5f₀, 7f₀… hasta que los bordes se forman! Pruébalo tú mismo:</p>
+    </div>
+
+    <!-- DEMO 2 -->
+    <div class="demo" id="s-armonicos">
+      <div class="demo-cab"><span class="icono">▶</span> Demo 2 — Serie de Fourier en acción</div>
+      <div class="demo-cuerpo">
+        <p class="demo-desc">Elige una onda y sube el número de armónicos N. La línea gris fina es la onda "ideal"; la morada es tu suma de N senoides. Observa cómo converge… y cómo en los saltos nunca desaparece del todo el sobrepaso (¡Gibbs!).</p>
+        <div class="controles">
+          <div class="ctrl">
+            <div class="ctrl-etiqueta"><span>Forma de onda</span></div>
+            <select id="arm_onda">
+              <option value="cuadrada">Onda cuadrada (solo impares)</option>
+              <option value="triangular">Triangular (solo impares, 1/n²)</option>
+              <option value="dentada">Sierra (todos, alternados)</option>
+            </select>
+          </div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Armónicos sumados N</span><span class="valor" id="arm_N_val"></span></div><input type="range" id="arm_N" min="1" max="31" step="2" value="5"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Fundamental f₀</span><span class="valor" id="arm_f0_val"></span></div><input type="range" id="arm_f0" min="1" max="20" step="0.5" value="3"></div>
+        </div>
+        <div class="graficos">
+          <div class="grafico-box">
+            <div class="grafico-titulo">Dominio del tiempo</div>
+            <canvas id="arm-canvas-t"></canvas>
+          </div>
+          <div class="grafico-box">
+            <div class="grafico-titulo">Espectro de líneas (n·f₀)</div>
+            <canvas id="arm-canvas-f"></canvas>
+          </div>
+        </div>
+        <div class="demo-leyenda">
+          <span class="ley-tiempo">Suma de armónicos</span>
+          <span class="ley-armónico">Líneas espectrales usadas</span>
+        </div>
+        <div class="demo-salida" id="arm-salida"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ Fenómeno de Gibbs</h4>
+      <p>Junta los ojos en los bordes de la cuadrada al subir N: hay un <strong>sobrepaso ~9%</strong> que nunca se va. Al agregar armónicos el lóbulo se hace más angosto, pero su altura no baja. Gibbs fue el que lo probó (1899). Signida: la serie <em>converge</em> casi en todos lados, pero en la discontinuidad el error puntual no tiende a cero.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-coeficientes">
+    <span class="nivel-badge">Nivel 20–40 · Serie de Fourier</span>
+    <h2>5. Los coeficientes a₀, aₙ, bₙ (aquí entra el rigor)</h2>
+
+    <p>Si la serie es una receta, los coeficientes son las <strong>gramaturas</strong>. ¿Cómo los calculamos? Con un truco de ortogonalidad brillante.</p>
+
+    <div class="formula">
+      <span class="destacada">x(t) = a₀/2 + Σ<sub>n=1</sub><sup>∞</sup> [ aₙ·cos(nω₀t) + bₙ·sen(nω₀t) ]</span>
+      <small>ω₀ = 2π/T = frecuencia fundamental · T = período de x(t)</small>
+    </div>
+
+    <div class="formula">
+      a₀ = (2/T) ∫₀ᵀ x(t) dt &nbsp;&nbsp;·&nbsp;&nbsp;
+      aₙ = (2/T) ∫₀ᵀ x(t)·cos(nω₀t) dt &nbsp;&nbsp;·&nbsp;&nbsp;
+      bₙ = (2/T) ∫₀ᵀ x(t)·sen(nω₀t) dt
+      <small>(Algunos libros usan a₀ = (1/T)∫… con a₀/2 en la serie — misma cosa. En tu clase se vio a₀ = promedio; si tu profe usa esa normalización, respétala en el examen.)</small>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 ¿Por qué funciona? Ortogonalidad</h4>
+      <p>Multiplica toda la serie por cos(mω₀t) e integra un período. Por ortogonalidad:</p>
+      <div class="formula" style="font-size:0.92rem;">
+        ∫₀ᵀ cos(nω₀t)·cos(mω₀t) dt = 0 si n ≠ m, &nbsp; T/2 si n = m<br>
+        ∫₀ᵀ sen(nω₀t)·cos(mω₀t) dt = <span class="destacada">0 siempre</span> (seno y coseno son ortogonales)
+      </div>
+      <p>Todos los términos de la suma se anulan <em>excepto</em> el que "resuena" con m. Es como un detector de frecuencia: la integral "sintoniza" n = m y escupe su amplitud. <strong>Esta misma idea es la integral de Fourier del nivel 40.</strong></p>
+    </div>
+
+    <div class="ejemplo">
+      <div class="ejemplo-cab">Ejemplo resuelto — estilo clase (prof. Sánchez Rendón)</div>
+      <div class="ejemplo-cuerpo">
+        <p>Calculemos los primeros coeficientes de x(t) = t² en un período T = 2π (se extiende periódicamente), usando la formulación del curso.</p>
+        <div class="paso"><div class="paso-num">1</div><div class="paso-cuerpo">
+          <p><strong>a₀ (valor medio):</strong></p>
+          <div class="formula" style="font-size:0.92rem; text-align:left;">a₀ = (1/2π) ∫₀^{2π} t² dt = (1/2π)·[t³/3]₀^{2π} = (1/2π)·(8π³/3) = <span class="destacada">4π²/3 ≈ 13.16</span></div>
+          <p>Interpretación: el "nivel DC" de t² sobre un período es ~13.16. La parte variable queda en los armónicos.</p>
+        </div></div>
+        <div class="paso"><div class="paso-num">2</div><div class="paso-cuerpo">
+          <p><strong>aₙ:</strong> se integra por partes dos veces y resulta (para esta señal par):</p>
+          <div class="formula" style="font-size:0.92rem; text-align:left;">aₙ = (4/n²) &nbsp; (n ≥ 1) &nbsp; → decae como 1/n²</div>
+          <p>bₙ = 0 porque x(t) = t² es <strong>par</strong> y el seno es impar: producto impar integrado en simetría = 0. (Truco de simetría que ahorra trabajo — úsalo en los ejercicios.)</p>
+        </div></div>
+        <div class="paso"><div class="paso-num">3</div><div class="paso-cuerpo">
+          <p><strong>Serie completa:</strong></p>
+          <div class="formula" style="font-size:0.9rem; text-align:left;">t² = 4π²/3 + Σ (4/n²)·cos(nt) = … + 4cos(t) + cos(2t) + (4/9)cos(3t) + …</div>
+          <p>Con solo 3 armónicos ya aproximas bien la parábola — y converge rápido (1/n²) porque la señal es suave. <strong>Señales con saltos decaen como 1/n (lento); señales suaves como 1/n² o más rápido.</strong></p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🧭 Guía de simetrías (atajos de examen)</h4>
+      <ul>
+        <li><strong>x par</strong> (x(−t)=x(t)) → solo cosenos: bₙ = 0. (Ej.: pulso centrado, t²)</li>
+        <li><strong>x impar</strong> (x(−t)=−x(t)) → solo senos: aₙ = 0, a₀ = 0. (Ej.: t, onda cuadrada)</li>
+        <li><strong>Media-impar</strong> x(t+T/2)=−x(t) → solo armónicos impares. (Ej.: cuadrada, triangular)</li>
+        <li><strong>a₀ = 0</strong> para toda señal "centrada en cero" — como viste en clase: si la señal es estable y simétrica, no hay nivel DC.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-euler">
+    <span class="nivel-badge">Nivel 20–40 · Serie de Fourier</span>
+    <h2>6. Euler: la llave maestra</h2>
+
+    <p>Los senos y cosenos son molestos de integrar juntos. Leonhard Euler encontró una escritura que los unifica:</p>
+
+    <div class="formula">
+      <span class="destacada">e<sup>jθ</sup> = cos θ + j·sen θ</span>
+      <small>j = √−1 (los ingenieros usan j; los matemáticos i)</small>
+    </div>
+
+    <p>Despejando:</p>
+    <div class="formula">
+      cos θ = (e<sup>jθ</sup> + e<sup>−jθ</sup>)/2 &nbsp;&nbsp;·&nbsp;&nbsp;
+      sen θ = (e<sup>jθ</sup> − e<sup>−jθ</sup>)/(2j)
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Serie exponencial de Fourier</h4>
+      <p>Usando Euler, la serie se reescribe en una sola línea elegante:</p>
+      <div class="formula">
+        <span class="destacada">x(t) = Σ<sub>n=−∞</sub><sup>∞</sup> cₙ · e<sup>jnω₀t</sup></span><br>
+        cₙ = (1/T) ∫₀ᵀ x(t)·e<sup>−jnω₀t</sup> dt
+      </div>
+      <p>Relación con los trigonométricos: <span class="inline-f">cₙ = (aₙ − j·bₙ)/2</span>, y c₀ = a₀/2. La parte real de cₙ es el coseno, la imaginaria el seno: <strong>|cₙ|</strong> es la amplitud y <strong>arg(cₙ)</strong> la fase del armónico n.</p>
+      <p><strong>Nota:</strong> con la exponencial el índice n toma valores negativos: e<sup>−jωt</sup> significa "frecuencia negativa" — un artefacto matemático que hace las cuentas simétricas. El espectro bilateral (±f) es el que usaremos en la transformada.</p>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🎯 ¿Y esto por qué importa?</h4>
+      <p>Porque la transformada de Fourier <strong>se escribe directamente con exponenciales</strong>: X(f) = ∫x(t)·e<sup>−j2πft</sup>dt. Sin Euler, esa fórmula es magia. Con Euler, es la serie exponencial llevada al límite T→∞. ¡La veremos en el nivel 40 con ojos nuevos!</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-espectro">
+    <span class="nivel-badge">Nivel 20–40 · Serie de Fourier</span>
+    <h2>7. Espectro de amplitud y de fase</h2>
+
+    <p>Cada cₙ es un número complejo: tiene magnitud y fase. Por eso el espectro se dibuja en <strong>dos gráficas</strong>:</p>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Gráfica</th><th>Eje vertical</th><th>Qué cuenta</th></tr>
+        <tr><td><strong>Espectro de amplitud</strong> |cₙ|</td><td>Magnitud</td><td>Cuánto pesa cada armónico (altura de la línea)</td></tr>
+        <tr><td><strong>Espectro de fase</strong> arg(cₙ)</td><td>Ángulo (rad o °)</td><td>En qué punto de su ciclo empieza cada armónico — ¡forma de onda!</td></tr>
+      </table>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ Trampa clásica de examen</h4>
+      <p>Dos señales con el <strong>misma amplitud espectral</strong> pero distinta fase se ven DIFERENTES en el tiempo (por eso tu Demo 1 al cambiar φ no alteraba el espectro de amplitud, pero sí la forma de x(t)). Para reconstruir la señal exacta necesitas <strong>ambos</strong>. En filtros ideales de fase lineal, la señal sale "retrasada" pero sin distorsión de forma.</p>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🎚️ Ancho de banda de una periódica</h4>
+      <p>Una onda cuadrada de f₀ = 1 kHz con armónicos útiles hasta n = 9 ocupa desde 0 Hz (DC si tiene media) hasta <strong>9 kHz</strong>: su ancho de banda B = 9·f₀. En la práctica se transmite hasta donde la potencia sea despreciable — de ahí que en Demo 2 (triangular, 1/n²) puedas conformarte con pocos armónicos: sus altos decaen rápido.</p>
+    </div>
+
+    <div class="quiz" data-quiz="q1" data-titulo="Nivel 20–40 · Serie de Fourier"></div>
+    <div data-ejercicios="n1"></div>
+  </section>
+
+  <!-- ============ NIVEL 40–60 · TRANSFORMADA ============ -->
+
+  <section class="seccion" id="s-limites">
+    <span class="nivel-badge">Nivel 40–60 · Transformada de Fourier</span>
+    <h2>8. De la serie a la integral: cuando T → ∞</h2>
+
+    <p>Hasta ahora: señales <strong>periódicas</strong> (se repiten para siempre). ¿Y un solo pulso? ¿Y un ECG de 3 segundos? ¿Y el silencio seguido de un golpe?</p>
+
+    <div class="tarjeta intuicion">
+      <h4>💡 El límite que lo cambia todo</h4>
+      <p>Imagina una señal periódica cuyo período T crece sin límite:</p>
+      <ul>
+        <li>Los armónicos están separados por Δf = f₀ = 1/T.</li>
+        <li>Si T → ∞, entonces Δf → 0: las líneas se acercan hasta <strong>fundirse en un espectro continuo</strong>.</li>
+        <li>La suma Σ se vuelve una integral ∫.</li>
+      </ul>
+      <p>La Transformada de Fourier es exactamente eso: <strong>la serie de Fourier de una señal no periódica</strong>, llevada al límite. La T finita "discretiza" la frecuencia; la T infinita la vuelve continua.</p>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Correspondencia exacta</h4>
+      <div class="formula" style="font-size:0.92rem; text-align:left;">
+        Serie (T finita): &nbsp; cₙ con frecuencias n·f₀ = n/T &nbsp; (discreto en f)<br>
+        Transformada (T → ∞): &nbsp; X(f) con f ∈ ℝ &nbsp; (continuo en f)<br>
+        Suma Σ<sub>n</sub> &nbsp;⟶&nbsp; &nbsp; ∫ df &nbsp;&nbsp;·&nbsp;&nbsp; cₙ &nbsp;⟶&nbsp; X(f)·Δf
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-formulas">
+    <span class="nivel-badge">Nivel 40–60 · Transformada de Fourier</span>
+    <h2>9. Las dos fórmulas (directa e inversa)</h2>
+
+    <div class="formula">
+      <span class="destacada">X(f) = ∫<sub>−∞</sub><sup>+∞</sup> x(t) · e<sup>−j2πft</sup> dt</span>
+      <small>Transformada directa: del tiempo a la frecuencia. "¿Cuánto de la frecuencia f hay en x(t)?"</small>
+    </div>
+
+    <div class="formula">
+      <span class="destacada">x(t) = ∫<sub>−∞</sub><sup>+∞</sup> X(f) · e<sup>+j2πft</sup> df</span>
+      <small>Transformada inversa: de la frecuencia al tiempo. "Reconstruye la señal a partir de su receta espectral"</small>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>📻 Analogía del receptor de radio</h4>
+      <p>La integral directa es <strong>sintonizar</strong>: pones el dial en f, el factor e<sup>−j2πft</sup> genera una referencia oscilando a esa frecuencia, y multiplicas por x(t) e integras. Si x(t) contiene f, todo "coincide en fase" y la integral acumula (gran |X(f)|). Si no, las contribuciones se cancelan y sale ~0. <strong>Es la misma ortogonalidad de aₙ/bₙ, ahora con todas las frecuencias reales, no solo los armónicos.</strong></p>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Notación y simetría</h4>
+      <ul>
+        <li>A veces se usa ω en lugar de f: X(ω) = ∫x(t)e<sup>−jωt</sup>dt · (1/2π) en la inversa. Cuidado con los factores 2π al cambiar de una a otra.</li>
+        <li>X(f) es en general <strong>compleja</strong>: |X(f)| amplitud, arg X(f) fase.</li>
+        <li>Par directa/inversa es única y siempre reversible: no se pierde información.</li>
+      </ul>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ Condición de existencia (Dirichlet, resumida)</h4>
+      <p>Basta con que x(t) sea absolutamente integrable (∫|x(t)|dt &lt; ∞) y tenga un número finito de máximos/mínimos y saltos. Las señales de energía finita (pulsos, ECG de duración finita) cumplen. Una pura senoide eterna "no integra" — se maneja con impulsos en el espectro (líneas imaginarias de altura ∞, la contraparte del espectro de líneas).</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-pares">
+    <span class="nivel-badge">Nivel 40–60 · Transformada de Fourier</span>
+    <h2>10. Pares importantes y propiedades útiles</h2>
+
+    <p>No se recomputa la integral cada vez: se <strong>memorizan pares</strong> y se usan propiedades.</p>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>x(t)</th><th>X(f)</th><th>Comentario</th></tr>
+        <tr><td>δ(t) impulso</td><td>1</td><td>Un chispazo contiene todas las frecuencias</td></tr>
+        <tr><td>1 (constante)</td><td>δ(f)</td><td>El nivel DC es "frecuencia 0"</td></tr>
+        <tr><td>e<sup>−at</sup>u(t), a&gt;0</td><td>1/(a + j2πf)</td><td>Caída exponencial → espectro tipo 1/f (ruido "rosa"-ish)</td></tr>
+        <tr><td>sen(2πf₀t)</td><td>[δ(f−f₀) − δ(f+f₀)]/(2j)</td><td>Un seno puro = dos líneas</td></tr>
+        <tr><td>pulso rect de ancho τ</td><td>τ·sinc(fτ)</td><td><strong>Par clave:</strong> rect ↔ sinc (Demo 3)</td></tr>
+        <tr><td>sinc(2Wt)</td><td>(1/2W)·rect(f/2W)</td><td> inverso del anterior — rect en frecuencia = ideal pasobanda</td></tr>
+        <tr><td>Gaussiana</td><td>Gaussiana</td><td>La única que es igual en ambos dominios (láser, Gabor)</td></tr>
+      </table>
+    </div>
+
+    <h3>Propiedades que usarás en comunicaciones</h3>
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Operación en tiempo</th><th>Efecto en frecuencia</th><th>Uso</th></tr>
+        <tr><td>a·x(t) + b·y(t)</td><td>a·X(f) + b·Y(f) — linealidad</td><td>Separar componentes</td></tr>
+        <tr><td>x(t − t₀)</td><td>X(f)·e<sup>−j2πft₀</sup> (solo fase)</td><td>Retardo / propagación</td></tr>
+        <tr><td>x(a·t)</td><td>(1/|a|)·X(f/a) — escalamiento</td><td>Compresión ↔ expansión espectral</td></tr>
+        <tr><td>x(t)·e<sup>j2πf_c t</sup></td><td>X(f − f_c) — desplazamiento</td><td><strong>Modulación</strong> (portadora)</td></tr>
+        <tr><td>x(t)·cos(2πf_c t)</td><td>½[X(f−f_c) + X(f+f_c)]</td><td><strong>AM, FDM, mezcladores</strong></td></tr>
+        <tr><td>x(t) * y(t) convolución</td><td>X(f)·Y(f) producto</td><td><strong>Filtrar = multiplicar en frecuencia</strong></td></tr>
+        <tr><td>x(t)·y(t) producto</td><td>X(f) * Y(f) convolución</td><td>Muestreo (luego veremos)</td></tr>
+      </table>
+    </div>
+
+    <div class="tarjeta conexion">
+      <h4>🔌 La fila de la modulación es TU futuro</h4>
+      <p>Multiplicar por cos(2πf_c t) <strong>muda el espectro hacia ±f_c</strong>. Eso es AM y es la puerta a FDM: a cada señal asígnavle una portadora y viajan juntas sin chocar. En Comunicaciones II volverás a esta tabla — y todo tomará sentido.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-banda">
+    <span class="nivel-badge">Nivel 40–60 · Transformada de Fourier</span>
+    <h2>11. Ancho de banda: la propiedad espectral de una señal</h2>
+
+    <p>Con la transformada podemos definir formalmente:</p>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Definición de ancho de banda B</h4>
+      <p>Para señal basebanda (centrada en 0): es la <strong>frecuencia máxima con energía significativa</strong>. Variantes: B de 3 dB, B al 99% de energía, B útil — pero la idea es una: <em>¿hasta dónde llega el espectro?</em></p>
+    </div>
+
+    <!-- DEMO 3 -->
+    <div class="demo">
+      <div class="demo-cab"><span class="icono">▶</span> Demo 3 — Pulso rect ↔ espectro sinc (tiempo vs frecuencia)</div>
+      <div class="demo-cuerpo">
+        <p class="demo-desc">Mueve τ (ancho del pulso). A la derecha ves |X(f)| = τ·|sinc(fτ)| con sus ceros marcados en rojo en f = k/τ. <strong>Pulso angosto ⇒ espectro ancho</strong> — la relación tiempo–frecuencia hecha visible.</p>
+        <div class="controles">
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Ancho del pulso τ</span><span class="valor" id="pul_tau_val"></span></div><input type="range" id="pul_tau" min="0.001" max="0.008" step="0.0005" value="0.004"></div>
+        </div>
+        <div class="graficos">
+          <div class="grafico-box">
+            <div class="grafico-titulo">Pulso en el tiempo</div>
+            <canvas id="pul-canvas-t"></canvas>
+          </div>
+          <div class="grafico-box">
+            <div class="grafico-titulo">Espectro |X(f)| con ceros</div>
+            <canvas id="pul-canvas-f"></canvas>
+          </div>
+        </div>
+        <div class="demo-salida" id="pul-salida"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🎯 La compensación fundamental</h4>
+      <p><strong>Tiempo y frecuencia son recursos opuestos.</strong> Un pulso de 1 ns (UWB, radar) ocupa ~1 GHz de espectro. Una nota de órgano que dura 5 segundos es espectralmente un bisturí. En comunicaciones: enviar bits MUY rápidos (pulsos angostos) exige más ancho de banda — la razón física del límite de datos de cualquier canal.</p>
+    </div>
+
+    <div class="quiz" data-quiz="q2" data-titulo="Nivel 40–60 · Transformada de Fourier"></div>
+    <div data-ejercicios="n2"></div>
+  </section>
+
+  <!-- ============ NIVEL 60–80 · MUESTREO ============ -->
+
+  <section class="seccion" id="s-muestreo">
+    <span class="nivel-badge">Nivel 60–80 · Muestreo y Nyquist</span>
+    <h2>12. De x(t) a x(n): el nacimiento de lo digital</h2>
+
+    <p>Aquí es donde tu proyecto cobra sentido. El mundo es analógico, pero el ESP32 es digital: solo ve <strong>muestras</strong> cada T<sub>s</sub> = 1/f<sub>s</sub> segundos.</p>
+
+    <div class="formula">
+      x(t) &nbsp; ⟶ <span class="destacada">muestrear</span> ⟶ &nbsp; x[n] = x(n·T<sub>s</sub>), &nbsp; T<sub>s</sub> = 1/f<sub>s</sub>
+      <small>Ej.: fs = 500 Hz → T_s = 2 ms → una muestra cada 2 milisegundos</small>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>💡 ¿Qué le pasa al espectro al muestrear?</h4>
+      <p>Muestrear = multiplicar por un tren de impulsos cada T<sub>s</sub>. En frecuencia eso es convolucionar con otro tren de impulsos espaciado fs → <strong>el espectro se REPITE (replica) cada fs Hz</strong>:</p>
+      <ul>
+        <li>Copia original centrada en 0.</li>
+        <li>Copias en ±fs, ±2fs, ±3fs…</li>
+        <li><strong>Si fs es suficientemente grande, las copias NO se pisan.</strong></li>
+        <li><strong>Si fs es chica, se montan y el espectro se corrompe = ALIASING.</strong></li>
+      </ul>
+    </div>
+
+    <div class="tarjeta conexion">
+      <h4>🔌 Tu cadena de hardware real</h4>
+      <div class="formula" style="text-align:left; font-size:0.92rem;">
+        Corazón → electrodos → <strong>AD8232</strong> (añade filtros 0.5–40 Hz + amplifica) → salida analógica → <strong>ADC del ESP32</strong> (GPIO 34/35/32/33) a fs que TÚ defines → <span class="destacada">x[n]</span> en la memoria → tu código (¡eventualmente una FFT!)
+      </div>
+      <p>El AD8232 ya hace parte del trabajo anti-alias: recorta contenido fuera de banda <em>antes</em> del muestreo. Tú decides fs con Nyquist.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-nyquist">
+    <span class="nivel-badge">Nivel 60–80 · Muestreo y Nyquist</span>
+    <h2>13. Teorema de Nyquist–Shannon y aliasing</h2>
+
+    <div class="formula">
+      <span class="destacada">f<sub>s</sub> ≥ 2·B</span>
+      <small>Nyquist rate = 2B · fs/2 = máxima frecuencia representable · probado por Shannon (1949), sobre ideas de Nyquist (1928)</small>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🎭 Analogía: el efecto estroboscópio</h4>
+      <p>Una rueda girando rápido, iluminada por un flash que parpadea a una frecuencia cercada, <strong>parece girar hacia atrás o muy lenta</strong>. ¿Por qué? El "muestreo" de luz (el flash) es más lento que los ciclos de la rueda: el movimiento se pliega en una frecuencia falsa más baja. Eso es <strong>aliasing</strong>. En audio: un tono de 70 Hz muestreado a 100 Hz "suena" como 30 Hz.</p>
+    </div>
+
+    <!-- DEMO 4 -->
+    <div class="demo">
+      <div class="demo-cab"><span class="icono">▶</span> Demo 4 — Muestreo y aliasing en vivo</div>
+      <div class="demo-cuerpo">
+        <p class="demo-desc">Señal real en azul tenue, muestras naranjas, y (si hay alias) la frecuencia falsa resultante en rojo. La línea amarilla marca fs/2. <strong>Sube f₀ por encima de fs/2 y mira la tragedia.</strong></p>
+        <div class="controles">
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Frecuencia real f₀</span><span class="valor" id="ali_f0_val"></span></div><input type="range" id="ali_f0" min="5" max="120" step="1" value="20"></div>
+          <div class="ctrl"><div class="ctrl-etiqueta"><span>Frecuencia de muestreo fs</span><span class="valor" id="ali_fs_val"></span></div><input type="range" id="ali_fs" min="20" max="200" step="5" value="100"></div>
+        </div>
+        <div class="graficos">
+          <div class="grafico-box">
+            <div class="grafico-titulo">Señal + muestras + reconstrucción</div>
+            <canvas id="ali-canvas-t"></canvas>
+          </div>
+          <div class="grafico-box">
+            <div class="grafico-titulo">Espectro: real vs réplicas (pliegue)</div>
+            <canvas id="ali-canvas-f"></canvas>
+          </div>
+        </div>
+        <div class="demo-leyenda">
+          <span class="ley-tiempo">Señal original</span>
+          <span class="ley-muestreo">Muestras a fs</span>
+          <span class="ley-muestras">Frecuencia alias (si hay)</span>
+        </div>
+        <div class="demo-salida" id="ali-salida"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta aviso">
+      <h4>⚠️ ¿Y si paso el filtro ANTES?</h4>
+      <p>Si la señal real tiene contenido hasta 40 Hz y muestreas a 100 Hz (Nyquist = 50 Hz), estás bien… <strong>salvo que una interferencia de 60 Hz llegue sin filtrar</strong>: 60 &gt; 50 → se pliega a 40 Hz y se cuela dentro de tu banda. Por eso: <strong>filtro analógico anti-alias ANTES del ADC</strong> + fs con margen. Recuerda: una vez aliasada, ¡la información está perdida para siempre! Ningún algoritmo posterior la recupera.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-reconstruir">
+    <span class="nivel-badge">Nivel 60–80 · Muestreo y Nyquist</span>
+    <h2>14. Reconstrucción: del CD al altavoz</h2>
+
+    <p>Nyquist también garantiza que las muestras <strong>sí permiten reconstruir</strong> la señal original. ¿Cómo? Con la fórmula de interpolación de sinc:</p>
+
+    <div class="formula">
+      x(t) = Σ<sub>n</sub> x[n] · <span class="destacada">sinc</span>((t − n·T<sub>s</sub>)/T<sub>s</sub>)
+      <small>Cada muestra "enciende" una sinc centrada en ella; la suma las une suavemente</small>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>💡 ¿Por qué sinc?</h4>
+      <p>Porque la sinc es la inversa del rect: si el espectro de las muestras (con réplicas sin solapar) es un rect que selecciona solo la copia central, en tiempo eso es convolucionar con sinc. En la práctica, DACs y filtros reales aproximan esa interpolación (ZOH, filtros de paso bajo). <strong>Un CD usa 44.1 kHz porque el audio tiene B ≈ 20 kHz → 2·20 = 40 kHz, con margen.</strong></p>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>📐 Esquema completo</h4>
+      <div class="formula" style="font-size:0.9rem; text-align:left;">
+        Muestreo (ideal): &nbsp; espectro se replica cada fs<br>
+        Si fs ≥ 2B: &nbsp; réplicas separadas &nbsp;→ &nbsp; filtro paso-bajo ideal (corte fs/2) elimina réplicas<br>
+        Sale exactamente X(f) original &nbsp;→ &nbsp; inversa de Fourier &nbsp;→ x(t) recuperada
+      </div>
+      <p>Es la demostración elegante del teorema: en frecuencia es solo "quitar copias de más".</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-ecg">
+    <span class="nivel-badge">Nivel 60–80 · Muestreo y Nyquist</span>
+    <h2>15. Caso real: tu proyecto de ECG</h2>
+
+    <p>Un electrocardiograma no es una senoide: es un tren de formas (P, QRS, T) que se repite con el ritmo cardíaco. Pero <strong>Fourier también lo describe</strong>: cada latido es una combinación de frecuencias, y el complejo QRS (el pico agudo) necesita los armónicos más altos.</p>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Componente</th><th>Frecuencias típicas</th><th>Señal en frecuencia</th></tr>
+        <tr><td>Base del ritmo (HR ~1 Hz)</td><td>0.5–5 Hz</td><td>Componente baja (onda de tendencia)</td></tr>
+        <tr><td>Onda P, T (suaves)</td><td>0.5–10 Hz</td><td>Media-baja</td></tr>
+        <tr><td>Complejo QRS (pico agudo)</td><td>10–40 Hz</td><td>Los armónicos altos — ¡el pulso angosto de la Demo 3!</td></tr>
+        <tr><td>Ruido muscular</td><td>&gt; 40 Hz</td><td>Fuera de banda: se filtra</td></tr>
+        <tr><td>Interferencia de red</td><td>60 Hz (Colombia)</td><td>Línea nítida: cavar con notch en la FFT</td></tr>
+      </table>
+    </div>
+
+    <!-- DEMO 5 -->
+    <div class="demo">
+      <div class="demo-cab"><span class="icono">▶</span> Demo 5 — ECG sintético: tiempo, muestras y espectro (DFT real)</div>
+      <div class="demo-cuerpo">
+        <p class="demo-desc">Señal construida con gaussianas para P, QRS y T (72 lpm por defecto). A la derecha, el <strong>espectro calculado con una DFT</strong> implementada en este navegador — exactamente el cálculo que hará tu ESP32. Cambia fs y observa cuándo el QRS se salva o se corrompe.</p>
+        <div class="controles">
+          <div class="ctrl">
+            <div class="ctrl-etiqueta"><span>Frecuencia de muestreo fs</span></div>
+            <select id="ecg_fs">
+              <option value="50">50 Hz (¡insuficiente!)</option>
+              <option value="100">100 Hz (mínimo justito)</option>
+              <option value="250" selected>250 Hz (clínico común)</option>
+              <option value="500">500 Hz (recomendado IS723)</option>
+              <option value="1000">1000 Hz (research)</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-etiqueta"><span>Ritmo cardíaco</span></div>
+            <select id="ecg_hr">
+              <option value="60">60 lpm (reposo)</option>
+              <option value="72" selected>72 lpm (normal)</option>
+              <option value="100">100 lpm (taquicardia)</option>
+              <option value="150">150 lpm (ejercicio intenso)</option>
+            </select>
+          </div>
+        </div>
+        <div class="graficos">
+          <div class="grafico-box">
+            <div class="grafico-titulo">ECG en el tiempo (muestras naranjas)</div>
+            <canvas id="ecg-canvas-t"></canvas>
+          </div>
+          <div class="grafico-box">
+            <div class="grafico-titulo">Espectro |X(f)| vía DFT (0–50 Hz)</div>
+            <canvas id="ecg-canvas-f"></canvas>
+          </div>
+        </div>
+        <div class="demo-salida" id="ecg-salida"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta conexion">
+      <h4>🔌 Decisiones para tu mini-proyecto</h4>
+      <ul>
+        <li><strong>B = 40 Hz</strong> → Nyquist teórico fs ≥ 80 Hz. Usa <strong>250–500 Hz</strong>: margen contra el filtro real del AD8232, ruido, y resolución fina para detectar picos.</li>
+        <li>Guarda N = 512 o 1024 muestras → con fs = 500, Δf = 500/1024 ≈ 0.49 Hz: puedes localizar la interferencia de 60 Hz en un bin exacto y "cavarla".</li>
+        <li>La frecuencia cardíaca en el dominio del tiempo = contar R-R; en frecuencia = ver la fundamental ~1.2 Hz. <strong>Dos caminos, el mismo corazón.</strong></li>
+      </ul>
+    </div>
+
+    <div class="quiz" data-quiz="q3" data-titulo="Nivel 60–80 · Muestreo y Nyquist"></div>
+    <div data-ejercicios="n3"></div>
+  </section>
+
+  <!-- ============ NIVEL 80–100 · DFT Y COMUNICACIONES ============ -->
+
+  <section class="seccion" id="s-dft">
+    <span class="nivel-badge">Nivel 80–100 · DFT y comunicaciones</span>
+    <h2>16. DFT: Fourier en la computadora</h2>
+
+    <p>La transformada continua es hermosa, pero una computadora no integra infinitesimales: tiene <strong>N números</strong>. La Transformada Discreta de Fourier los convierte en N números espectrales:</p>
+
+    <div class="formula">
+      <span class="destacada">X[k] = Σ<sub>n=0</sub><sup>N−1</sup> x[n] · e<sup>−j2πkn/N</sup></span> , &nbsp; k = 0, 1, …, N−1
+      <small>x[n] = muestras · X[k] = espectro en los "bins" k · j corre en tu ESP32, PC o en la Demo 5 de esta guía</small>
+    </div>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Concepto</th><th>Fórmula</th><th>Significado práctico</th></tr>
+        <tr><td>Bins (k)</td><td>f<sub>k</sub> = k · Δf</td><td>Cada k mide una frecuencia concreta</td></tr>
+        <tr><td>Resolución espectral</td><td>Δf = f<sub>s</sub> / N</td><td>Distancia entre bins; para distinguir tonos cercanos necesitas N grande</td></tr>
+        <tr><td>Tiempo de ventana</td><td>T = N / f<sub>s</sub></td><td>Más tiempo observado = más resolución (Δf = 1/T)</td></tr>
+        <tr><td>Nyquist en bins</td><td>k hasta N/2 = f<sub>s</sub>/2</td><td>Mitad útil del espectro (la otra mitad es espejo para señal real)</td></tr>
+        <tr><td>Magnitud</td><td>|X[k]|</td><td>Amplitud de esa componente (×2/N para amplitud física en la DFT de esta guía)</td></tr>
+        <tr><td>Fase</td><td>arg X[k]</td><td>Desfase de la componente</td></tr>
+      </table>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>⚡ FFT: el truco que lo hizo posible</h4>
+      <p>La DFT directa cuesta O(N²) productos. La <strong>FFT</strong> (Cooley–Tukey, 1965) reordena el cálculo en O(N log N): para N = 1024, ~100 veces más rápida, <em>con exactitud matemática idéntica</em> (no es una aproximación: es la misma DFT computada con menos operaciones). Gracias a ella existen MP3, WiFi, espectrogramas en tiempo real y el análisis espectral en microcontroladores.</p>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>🔬 Ejercicio mental de dominio</h4>
+      <p>Tienes fs = 8 kHz (voz telefónica), N = 8000 → Δf = 1 Hz, ventana 1 s. ¿Quieres ver mejor los formantes de una vocal de 50 ms? Baja N (menos tiempo, Δf más gruesa pero capturas el instante) — <strong>hay un compromiso tiempo–frecuencia inevitable (relación de incertidumbre de Gabor)</strong>: es el límite de Heisenberg de las señales. El espectrograma lo navega con ventanas deslizantes.</p>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-comms">
+    <span class="nivel-badge">Nivel 80–100 · DFT y comunicaciones</span>
+    <h2>17. Fourier es Comunicaciones: FDM, OFDM y más</h2>
+
+    <div class="tarjeta conexion">
+      <h4>🔌 Mapa hacia Comunicaciones II</h4>
+      <p>Cada técnica de tu próximo curso es una propiedad de Fourier aplicada con negocio:</p>
+    </div>
+
+    <div class="tabla-wrap">
+      <table>
+        <tr><th>Técnica</th><th>Concepto de Fourier</th><th>Qué logra</th></tr>
+        <tr>
+          <td><strong>AM / modulación</strong></td>
+          <td>x(t)·cos(2πf_c t) ↔ desplazar X(f) a ±f_c</td>
+          <td>Llevar la señal a la frecuencia del canal (antena, cable)</td>
+        </tr>
+        <tr>
+          <td><strong>FDM</strong></td>
+          <td>Variantes de la modulación: cada señal en su banda, filtros pasobanda en el receptor</td>
+          <td>Radio AM, telefonía clásica, DSL: muchos canales a la vez</td>
+        </tr>
+        <tr>
+          <td><strong>OFDM</strong> (WiFi, 4G/5G, DVB)</td>
+          <td>Cientos de subportadoras ortogonales; la IFFT/FFT sintetiza/detecta todas a la vez</td>
+          <td>Espectralmente eficiente y robusto a multi-trayecto; cada subportadora es "un armónico" bien elegido</td>
+        </tr>
+        <tr>
+          <td><strong>Filtrado</strong></td>
+          <td>Convolution theorem: y = x*h ↔ Y = X·H</td>
+          <td>Eliminar ruido, dar forma al espectro (pulso root-raised-cosine…)</td>
+        </tr>
+        <tr>
+          <td><strong>Espectro de emisión</strong></td>
+          <td>|X(f)| de la forma de pulso</td>
+          <td>Cumplir máscaras legales, no invadir canales vecinos</td>
+        </tr>
+        <tr>
+          <td><strong>Compresión</strong> (MP3, JPEG)</td>
+          <td>Transformar (Fourier/wavelet) + eliminar coeficientes poco perceptibles</td>
+          <td>Menos bits, misma calidad percibida</td>
+        </tr>
+        <tr>
+          <td><strong>FFT en receptores</strong></td>
+          <td>OFDM: un símbolo en frecuencia = N modulaciones en paralelo</td>
+          <td>Demodulación masiva en un solo golpe matemático</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="tarjeta intuicion">
+      <h4>📡 ¿Por qué OFDM es "Fourier puro"?</h4>
+      <p>OFDM transmite N bits en N subportadoras <em>simultáneamente</em>, espaciadas exactamente 1/T (T = duración del símbolo). Esa separación hace que el espectro de cada subportadora (sinc) tenga sus <strong>ceros justo en las frecuencias de las demás</strong> → ortogonalidad → cero interferencia aunque se solapen visualmente. El emisor calcula la IFFT (inversa: frecuencia → tiempo) y el receptor la FFT. <strong>Un chip de WiFi es, en el fondo, una máquina de Fourier corriendo millones de veces por segundo.</strong></p>
+    </div>
+
+    <div class="tarjeta rigor">
+      <h4>🧭 Lista de aplicaciones (para tu portafolio/examen)</h4>
+      <ul>
+        <li><strong>Biomedicina:</strong> espectrograma de ECG/EEG, detección de arritmias, filtros QRS.</li>
+        <li><strong>Audio:</strong> ecualizadores, MP3/AAC, reconocimiento de voz (mel-espectrogramas de las redes neuronales).</li>
+        <li><strong>Redes:</strong> WiFi (OFDM), 4G/5G (OFDMA), DSL (DMT = OFDM por cable).</li>
+        <li><strong>Radar/sonar:</strong> un pulso corto (ancho B grande) da resolución fina de distancia.</li>
+        <li><strong>Óptica:</strong> el patrón de difracción de una rendija es |FFT| del agujero.</li>
+        <li><strong>Matemática aplicada:</strong> resolver ecuaciones diferenciales, series de tiempo financieras.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="seccion" id="s-checklist">
+    <span class="nivel-badge">Nivel 80–100 · Cierre</span>
+    <h2>18. Checklist: ¿llegaste al 100?</h2>
+
+    <p>Antes del quiz final, verifica estas afirmaciones. Si puedes <strong>explicarlas en voz alta sin mirar</strong>, dominas el tema:</p>
+
+    <ul class="checklist">
+      <li>Explico la diferencia entre dominio del tiempo y de frecuencia con una analogía propia.</li>
+      <li>Escribo A, f, φ de una sinusoide y sé qué es ω y por qué ω = 2πf.</li>
+      <li>Describo la serie de Fourier y calculo a₀, aₙ, bₙ de una señal sencilla usando simetrías.</li>
+      <li>Explico la ortogonalidad: por qué la integral "extrae" cada coeficiente.</li>
+      <li>Escribo la relación de Euler y relaciono cₙ con aₙ, bₙ.</li>
+      <li>Explico qué le pasa a las líneas del espectro cuando T → ∞ (nace X(f)).</li>
+      <li>Escribo las fórmulas directa e inversa e interpreto e<sup>−j2πft</sup> como detector de frecuencia.</li>
+      <li>Recuerdo ≥5 pares importantes y ≥4 propiedades (en especial modulación y convolución).</li>
+      <li>Defino ancho de banda B y explico la relación tiempo–frecuencia con el sinc.</li>
+      <li>Aplico Nyquist: doy fs mínima, detecto y explico un aliasing concreto.</li>
+      <li>Explico por qué la reconstrucción usa sinc y qué pasa si fs &lt; 2B (pérdida irreversible).</li>
+      <li>Conecto todo con mi ECG: B, fs elegido, bins de la DFT, interferencia de 60 Hz.</li>
+      <li>Defino DFT, Δf = fs/N y por qué la FFT es O(N log N).</li>
+      <li>Explico FDM y OFDM en términos de desplazamiento espectral y ortogonalidad.</li>
+    </ul>
+
+    <div class="quiz" data-quiz="q4" data-titulo="Nivel 80–100 · DFT y comunicaciones"></div>
+    <div data-ejercicios="n4"></div>
+
+    <div class="quiz" data-quiz="qf" data-titulo="🏁 Quiz final — los 10 del 100"></div>
+  </section>
+
+  <section class="seccion" id="s-cierre">
+    <div class="tarjeta intuicion">
+      <h4>🎓 Lo que ya tienes</h4>
+      <p>Has recorrido el arco completo: <strong>intuición</strong> (receta vs pastel, estroboscopio, radio sintonizable) → <strong>rigor</strong> (a₀/aₙ/bₙ, Euler, integral de Fourier, pares) → <strong>digital</strong> (Nyquist, aliasing, DFT/FFT) → <strong>aplicación</strong> (ECG, FDM/OFDM). Cuando en Comunicaciones II veas modulación, reconocerás al instante: "es el desplazamiento X(f−f_c)". Cuando programes tu ESP32, sabrás por qué 500 Hz y no 50. Eso es estar adelantado.</p>
+      <p><strong>Repasa cada semana un nivel, rehaz los quizzes hasta 100%, y vuelve a los demos cuando algo se te olvide.</strong> ¡Éxito en el curso y en el proyecto!</p>
+    </div>
+
+    <p class="nota-pie">
+      Guía "Fourier de 0 a 100" · Comunicaciones I (IS723) · Universidad Tecnológica de Pereira ·
+      Material de estudio complementario basado en la clase del 17/09/2026 (prof. José Oscar Sánchez Rendón) y la guía del mini-proyecto ECG (ESP32 + AD8232).
+      Todos los cálculos de esta página (DFT incluida) se ejecutan localmente en tu navegador — sin dependencias externas.
+    </p>
+  </section>
+
+</main>
+
+<script src="js/plots.js"></script>
+<script src="js/demos.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
